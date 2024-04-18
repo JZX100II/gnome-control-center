@@ -110,6 +110,7 @@
                 <child>
                   <object class="AdwActionRow">
                     <property name="title" translatable="yes">_Times</property>
+                    <property name="visible">FALSE</property>
                     <property name="use-underline">True</property>
                     <property name="sensitive" bind-source="night_light_toggle_row" bind-property="active" bind-flags="default|sync-create" />
 
