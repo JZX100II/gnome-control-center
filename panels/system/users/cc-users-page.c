@@ -103,8 +103,10 @@ on_user_row_activated (CcUsersPage  *self,
 static void
 on_other_users_model_changed (CcUsersPage *self)
 {
+    //gtk_widget_set_visible (self->other_users_group,
+    //                        g_list_model_get_n_items (G_LIST_MODEL (self->model)) > 0);
     gtk_widget_set_visible (self->other_users_group,
-                            g_list_model_get_n_items (G_LIST_MODEL (self->model)) > 0);
+                            FALSE);
 }
 
 static GtkWidget *
