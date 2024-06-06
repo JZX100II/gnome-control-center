@@ -797,6 +797,18 @@ cc_wwan_panel_static_init_func (void)
   g_autoptr(MMManager) mm_manager = NULL;
   g_autoptr(GError) error = NULL;
 
+  gint exit_status = 0;
+  g_spawn_command_line_sync ("systemctl is-active -q ModemManager",
+                             NULL,
+                             NULL,
+                             &exit_status,
+                             NULL);
+
+  if (exit_status != 0) {
+    g_debug ("ModemManager is stopped, not creating an object");
+    return;
+  }
+
   /*
    * There could be other modems that are only handled by rfkill,
    * and not available via ModemManager.  But as this panel
