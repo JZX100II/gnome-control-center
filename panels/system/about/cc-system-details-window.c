@@ -457,6 +457,12 @@ droid_get_cpu_info ()
 {
   gchar * content = NULL;
   GError * error = NULL;
+
+  if (g_file_get_contents ("/usr/lib/droidian/device/cpuinfo", &content, NULL, &error))
+    return g_strstrip (content);
+
+  g_clear_error (&error);
+
   if (!g_file_get_contents ("/proc/cpuinfo", &content, NULL, &error)) {
     g_printerr ("Error reading file: %s\n", error->message);
     g_error_free (error);
