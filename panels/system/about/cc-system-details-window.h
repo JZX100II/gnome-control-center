@@ -20,6 +20,7 @@
 #pragma once
 
 #include <adwaita.h>
+#include <sys/statvfs.h>
 
 G_BEGIN_DECLS
 
@@ -29,8 +30,10 @@ G_DECLARE_FINAL_TYPE (CcSystemDetailsWindow, cc_system_details_window, CC, SYSTE
 CcSystemDetailsWindow   *cc_system_details_window_new   (void);
 char                    *get_hardware_model_string      (void);
 char                    *get_cpu_info                   (void);
+char                    *droid_get_cpu_info             (void);
 char                    *get_os_name                    (void);
 guint64                  get_ram_size_dmi               (void);
 guint64                  get_ram_size_libgtop           (void);
 char                    *get_primary_disk_info          (void);
+char                    *droid_get_primary_disk_info    (void);
 G_END_DECLS
