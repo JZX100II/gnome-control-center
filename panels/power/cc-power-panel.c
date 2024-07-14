@@ -1350,7 +1350,7 @@ battery_sort_func (GtkListBoxRow *a, GtkListBoxRow *b, gpointer data)
   return a_kind - b_kind;
 }
 
-int
+static int
 check_batman_active ()
 {
   char *line = NULL;
@@ -1366,7 +1366,7 @@ check_batman_active ()
   return result;
 }
 
-int
+static int
 check_batman_enabled ()
 {
   char *line = NULL;
@@ -1382,7 +1382,7 @@ check_batman_enabled ()
   return result;
 }
 
-void
+static void
 batman_ctl_active_cb (GObject* src_ctl, GAsyncResult*, gpointer sender)
 {
     int active = check_batman_active ();
@@ -1392,7 +1392,7 @@ batman_ctl_active_cb (GObject* src_ctl, GAsyncResult*, gpointer sender)
     g_object_unref (src_ctl);
 }
 
-void
+static void
 batman_ctl_enabled_cb (GObject* src_ctl, GAsyncResult*, gpointer sender)
 {
     int enabled = check_batman_enabled ();
@@ -1402,7 +1402,7 @@ batman_ctl_enabled_cb (GObject* src_ctl, GAsyncResult*, gpointer sender)
     g_object_unref (src_ctl);
 }
 
-gboolean
+static gboolean
 batman_service_active_switch_state_set (GtkSwitch* sender, gboolean state, gpointer)
 {
     const gchar* ctl_argv[] = {
@@ -1413,7 +1413,7 @@ batman_service_active_switch_state_set (GtkSwitch* sender, gboolean state, gpoin
     return TRUE;
 }
 
-gboolean
+static gboolean
 batman_service_enabled_switch_state_set (GtkSwitch* sender, gboolean state, gpointer)
 {
     const gchar* ctl_argv[] = {
