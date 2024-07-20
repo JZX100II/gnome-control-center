@@ -42,6 +42,7 @@ struct _CcPowerPanel
   CcPanel            parent_instance;
 
   AdwSwitchRow      *als_row;
+  AdwSwitchRow      *als_smoothed_row;
   GtkWindow         *automatic_suspend_dialog;
   CcListRow         *automatic_suspend_row;
   AdwEntryRow       *batman_max_cpu_row;
@@ -291,18 +292,41 @@ up_client_device_added (CcPowerPanel *self,
 }
 
 static void
+als_smoothed_row_changed_cb (CcPowerPanel *self)
+{
+  gboolean normal_enabled, smoothed_enabled;
+  smoothed_enabled = adw_switch_row_get_active (self->als_smoothed_row);
+  normal_enabled = adw_switch_row_get_active (self->als_row);
+  g_debug ("Setting smoothed ALS enabled %s", smoothed_enabled ? "on" : "off");
+
+  if (normal_enabled == TRUE && smoothed_enabled == TRUE)
+    {
+       adw_switch_row_set_active (self->als_row, FALSE); // if both were toggled, toggle one off
+    }
+
+  g_settings_set_boolean (self->gsd_settings, "ambient-smoothed-enabled", smoothed_enabled);
+}
+
+static void
 als_row_changed_cb (CcPowerPanel *self)
 {
-  gboolean enabled;
-  enabled = adw_switch_row_get_active (self->als_row);
-  g_debug ("Setting ALS enabled %s", enabled ? "on" : "off");
-  g_settings_set_boolean (self->gsd_settings, "ambient-enabled", enabled);
+  gboolean normal_enabled, smoothed_enabled;
+  smoothed_enabled = adw_switch_row_get_active (self->als_smoothed_row);
+  normal_enabled = adw_switch_row_get_active (self->als_row);
+  g_debug ("Setting ALS enabled %s", normal_enabled ? "on" : "off");
+
+  if (normal_enabled == TRUE && smoothed_enabled == TRUE)
+    {
+       adw_switch_row_set_active (self->als_smoothed_row, FALSE); // if both were toggled, toggle one off
+    }
+
+  g_settings_set_boolean (self->gsd_settings, "ambient-enabled", normal_enabled);
 }
 
 static void
 als_enabled_state_changed (CcPowerPanel *self)
 {
-  gboolean enabled;
+  gboolean enabled; // also for the smoothed als button
   gboolean visible = FALSE;
 
   if (self->iio_proxy != NULL)
@@ -317,10 +341,15 @@ als_enabled_state_changed (CcPowerPanel *self)
 
   enabled = g_settings_get_boolean (self->gsd_settings, "ambient-enabled");
   g_debug ("ALS enabled: %s", enabled ? "on" : "off");
+  g_debug ("Smoothed ALS enabled %s", enabled ? "on" : "off");
   g_signal_handlers_block_by_func (self->als_row, als_row_changed_cb, self);
+  g_signal_handlers_block_by_func (self->als_smoothed_row, als_smoothed_row_changed_cb, self); // smoothed als button
   adw_switch_row_set_active (self->als_row, enabled);
+  adw_switch_row_set_active (self->als_smoothed_row, enabled);
   gtk_widget_set_visible (GTK_WIDGET (self->als_row), visible && self->has_brightness);
+  gtk_widget_set_visible (GTK_WIDGET (self->als_smoothed_row), visible && self->has_brightness);
   g_signal_handlers_unblock_by_func (self->als_row, als_row_changed_cb, self);
+  g_signal_handlers_unblock_by_func (self->als_smoothed_row, als_smoothed_row_changed_cb, self);
 }
 
 static void
@@ -1462,6 +1491,7 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
   gtk_widget_class_set_template_from_resource (widget_class, "/org/gnome/control-center/power/cc-power-panel.ui");
 
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, als_row);
+  gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, als_smoothed_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, automatic_suspend_dialog);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, automatic_suspend_row);
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, batman_max_cpu_row);
@@ -1496,6 +1526,7 @@ cc_power_panel_class_init (CcPowerPanelClass *klass)
   gtk_widget_class_bind_template_child (widget_class, CcPowerPanel, suspend_on_ac_switch_row);
 
   gtk_widget_class_bind_template_callback (widget_class, als_row_changed_cb);
+  gtk_widget_class_bind_template_callback (widget_class, als_smoothed_row_changed_cb);
   gtk_widget_class_bind_template_callback (widget_class, blank_screen_row_changed_cb);
   gtk_widget_class_bind_template_callback (widget_class, keynav_failed_cb);
   gtk_widget_class_bind_template_callback (widget_class, power_button_row_changed_cb);
