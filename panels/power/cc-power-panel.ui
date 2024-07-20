@@ -141,6 +141,14 @@
                   </object>
                 </child>
                 <child>
+                  <object class="AdwSwitchRow" id="als_smoothed_row">
+                    <property name="title" translatable="yes">A_utomatic Smoothed Screen Brightness</property>
+                    <property name="subtitle" translatable="yes">Adjust screen brightness smoothly to the surrounding light</property>
+                    <property name="use_underline">True</property>
+                    <signal name="notify::active" handler="als_smoothed_row_changed_cb" object="CcPowerPanel" swapped="yes"/>
+                  </object>
+                </child>
+                <child>
                   <object class="AdwSwitchRow" id="dim_screen_row">
                     <property name="title" translatable="yes">_Dim Screen</property>
                     <property name="subtitle" translatable="yes">Reduce screen brightness when the computer is inactive</property>
